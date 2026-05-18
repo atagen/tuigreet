@@ -435,7 +435,7 @@ pub struct ThemeConfig {
 #[derive(Debug, Clone, Deserialize, Serialize, Default, PartialEq)]
 pub struct BackgroundConfig {
   /// Which animation to run. `None` or `"none"` disables animations.
-  /// Currently supported: `"doom"`, `"matrix"`.
+  /// Currently supported: `"doom"`, `"matrix"`, `"plasma"`.
   #[serde(default)]
   pub kind: Option<String>,
 
@@ -451,6 +451,10 @@ pub struct BackgroundConfig {
   /// Parameters for the cmatrix-style digital rain effect.
   #[serde(default)]
   pub matrix: MatrixConfig,
+
+  /// Parameters for the analytic plasma effect.
+  #[serde(default)]
+  pub plasma: PlasmaConfig,
 }
 
 /// Parameters for the DOOM-style fire animation. Field names mirror Ly's
@@ -515,6 +519,33 @@ pub struct MatrixConfig {
   /// shimmer). `0.0` disables.
   #[serde(default)]
   pub mutate_chance: Option<f32>,
+}
+
+/// Parameters for the analytic plasma animation.
+#[derive(Debug, Clone, Deserialize, Serialize, Default, PartialEq)]
+pub struct PlasmaConfig {
+  /// Spatial scale of the plasma bands. Higher = larger bands. Clamped
+  /// to `>= 1.0`.
+  #[serde(default)]
+  pub scale: Option<f32>,
+
+  /// Phase advance per frame. Higher = faster motion. Clamped to
+  /// `-1.0..=1.0`.
+  #[serde(default)]
+  pub speed: Option<f32>,
+
+  /// Color at the low end of the gradient. Accepts `#RRGGBB`,
+  /// `0xRRGGBB`, or any color name accepted by ratatui.
+  #[serde(default)]
+  pub low_color: Option<String>,
+
+  /// Color at the middle of the gradient.
+  #[serde(default)]
+  pub mid_color: Option<String>,
+
+  /// Color at the high end of the gradient.
+  #[serde(default)]
+  pub high_color: Option<String>,
 }
 
 /// Greeting alignment options

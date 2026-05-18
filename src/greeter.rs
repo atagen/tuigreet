@@ -847,6 +847,24 @@ impl Greeter {
        0.30,1.10)",
       "MIN,MAX",
     );
+    opts.optopt(
+      "",
+      "plasma-colors",
+      "plasma gradient stops as LOW,MID,HIGH (each #RRGGBB or named)",
+      "LOW,MID,HIGH",
+    );
+    opts.optopt(
+      "",
+      "plasma-scale",
+      "plasma spatial scale (larger = wider bands, default: 18.0)",
+      "SCALE",
+    );
+    opts.optopt(
+      "",
+      "plasma-speed",
+      "plasma phase advance per frame (default: 0.06)",
+      "SPEED",
+    );
 
     opts
   }
@@ -1137,7 +1155,7 @@ impl Greeter {
     &mut self,
     cfg: &tuigreet::config::BackgroundConfig,
   ) {
-    use crate::ui::bg_animation::{Kind, doom, matrix};
+    use crate::ui::bg_animation::{Kind, doom, matrix, plasma};
 
     let Some(kind) = cfg.kind.as_deref().and_then(Kind::from_name) else {
       if let Some(name) = cfg.kind.as_deref()
@@ -1183,6 +1201,16 @@ impl Greeter {
           min_speed:     cfg.matrix.min_speed.unwrap_or(d.min_speed),
           max_speed:     cfg.matrix.max_speed.unwrap_or(d.max_speed),
           mutate_chance: cfg.matrix.mutate_chance.unwrap_or(d.mutate_chance),
+        })
+      },
+      Kind::Plasma => {
+        let d = plasma::Options::default();
+        AnimationSpec::Plasma(plasma::Options {
+          scale: cfg.plasma.scale.unwrap_or(d.scale),
+          speed: cfg.plasma.speed.unwrap_or(d.speed),
+          low:   parse(&cfg.plasma.low_color, d.low),
+          mid:   parse(&cfg.plasma.mid_color, d.mid),
+          high:  parse(&cfg.plasma.high_color, d.high),
         })
       },
     };

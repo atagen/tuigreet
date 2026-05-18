@@ -244,6 +244,21 @@ fn apply_config_layer(dest: &mut Config, src: Config) {
   if src.background.matrix.mutate_chance.is_some() {
     dest.background.matrix.mutate_chance = src.background.matrix.mutate_chance;
   }
+  if src.background.plasma.scale.is_some() {
+    dest.background.plasma.scale = src.background.plasma.scale;
+  }
+  if src.background.plasma.speed.is_some() {
+    dest.background.plasma.speed = src.background.plasma.speed;
+  }
+  if src.background.plasma.low_color.is_some() {
+    dest.background.plasma.low_color = src.background.plasma.low_color;
+  }
+  if src.background.plasma.mid_color.is_some() {
+    dest.background.plasma.mid_color = src.background.plasma.mid_color;
+  }
+  if src.background.plasma.high_color.is_some() {
+    dest.background.plasma.high_color = src.background.plasma.high_color;
+  }
 
   // Outputs: a non-empty list from a higher-priority layer fully replaces
   if !src.outputs.is_empty() {
@@ -552,7 +567,8 @@ pub fn extract_cli_config(matches: &getopts::Matches) -> Config {
   if let Some(s) = matches.opt_str("matrix-length") {
     let parts: Vec<&str> = s.split(',').map(str::trim).collect();
     if parts.len() == 2
-      && let (Ok(lo), Ok(hi)) = (parts[0].parse::<u16>(), parts[1].parse::<u16>())
+      && let (Ok(lo), Ok(hi)) =
+        (parts[0].parse::<u16>(), parts[1].parse::<u16>())
     {
       config.background.matrix.min_length = Some(lo);
       config.background.matrix.max_length = Some(hi);
@@ -561,11 +577,30 @@ pub fn extract_cli_config(matches: &getopts::Matches) -> Config {
   if let Some(s) = matches.opt_str("matrix-speed") {
     let parts: Vec<&str> = s.split(',').map(str::trim).collect();
     if parts.len() == 2
-      && let (Ok(lo), Ok(hi)) = (parts[0].parse::<f32>(), parts[1].parse::<f32>())
+      && let (Ok(lo), Ok(hi)) =
+        (parts[0].parse::<f32>(), parts[1].parse::<f32>())
     {
       config.background.matrix.min_speed = Some(lo);
       config.background.matrix.max_speed = Some(hi);
     }
+  }
+  if let Some(colors) = matches.opt_str("plasma-colors") {
+    let parts: Vec<&str> = colors.split(',').map(str::trim).collect();
+    if parts.len() == 3 {
+      config.background.plasma.low_color = Some(parts[0].to_string());
+      config.background.plasma.mid_color = Some(parts[1].to_string());
+      config.background.plasma.high_color = Some(parts[2].to_string());
+    }
+  }
+  if let Some(s) = matches.opt_str("plasma-scale")
+    && let Ok(v) = s.parse::<f32>()
+  {
+    config.background.plasma.scale = Some(v);
+  }
+  if let Some(s) = matches.opt_str("plasma-speed")
+    && let Ok(v) = s.parse::<f32>()
+  {
+    config.background.plasma.speed = Some(v);
   }
   config
 }

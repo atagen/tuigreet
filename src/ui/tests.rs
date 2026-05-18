@@ -822,6 +822,52 @@ async fn test_doom_animation_renders_and_form_stays_legible() {
 }
 
 #[tokio::test]
+async fn test_plasma_animation_renders_and_form_stays_legible() {
+  use crate::ui::bg_animation::{self as animation, AnimationSpec, plasma};
+
+  let greeter = test_greeter();
+  {
+    let mut g = greeter.write().await;
+    g.mode = Mode::Username;
+    g.animation = Some(animation::build(&AnimationSpec::Plasma(
+      plasma::Options::default(),
+    )));
+  }
+
+  // A single frame is enough — plasma is purely a function of phase, no
+  // warm-up is required to paint the screen.
+  let buffer = render_ui(greeter, 80, 24).await;
+
+  // The half-block character should appear somewhere outside the login
+  // form area.
+  let painted_outside_form = (0..80).any(|x| {
+    (0..6).chain(18..24).any(|y: u16| {
+      let sym = buffer[(x, y)].symbol();
+      sym.chars().next() == Some('▀')
+    })
+  });
+  assert!(
+    painted_outside_form,
+    "plasma should paint upper-half-block cells outside the form area"
+  );
+
+  // The login form has been Cleared, so its inner cells must not carry
+  // the plasma glyph.
+  let form_y = 12u16;
+  let block_in_form = (20..60).any(|x| {
+    buffer[(x, form_y)]
+      .symbol()
+      .chars()
+      .next()
+      .map_or(false, |c| c == '▀')
+  });
+  assert!(
+    !block_in_form,
+    "plasma glyphs must not bleed through the login form"
+  );
+}
+
+#[tokio::test]
 async fn test_matrix_animation_renders_and_form_stays_legible() {
   use crate::ui::bg_animation::{self as animation, AnimationSpec, matrix};
 
