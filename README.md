@@ -124,6 +124,11 @@ The following animation is available out of the box:
   with `--matrix-length MIN,MAX` (rows, default `6,18`) and fall speed
   with `--matrix-speed MIN,MAX` (rows-per-frame, default `0.30,1.10`); the
   three color bands are set together with `--matrix-colors HEAD,BRIGHT,DIM`.
+- `plasma` — Smoothly flowing analytic plasma rendered at half-cell
+  vertical resolution. `--plasma-scale` (default `18.0`) controls the
+  size of the colored bands and `--plasma-speed` (phase advance per
+  frame, default `0.06`) controls how fast they move; the three
+  gradient stops are set together with `--plasma-colors LOW,MID,HIGH`.
 
 You can also switch animations on the fly without restarting the greeter
 by hitting `F4`. This opens a small menu listing every available
@@ -321,6 +326,13 @@ max_length = 18
 min_speed = 0.30     # rows per frame
 max_speed = 1.10
 mutate_chance = 0.02 # per-cell glyph shimmer probability
+
+[background.plasma]
+scale = 18.0         # higher = wider bands
+speed = 0.06         # phase advance per frame
+low_color = "#1A2080"
+mid_color = "#A040C0"
+high_color = "#FFC0E0"
 
 [session]
 sessions_dirs = ["/usr/share/wayland-sessions", "/usr/share/xsessions"]
