@@ -243,6 +243,14 @@ fn apply_config_layer(dest: &mut Config, src: Config) {
   }
   if src.background.matrix.mutate_chance.is_some() {
     dest.background.matrix.mutate_chance = src.background.matrix.mutate_chance;
+  if src.background.cellauto.rule.is_some() {
+    dest.background.cellauto.rule = src.background.cellauto.rule;
+  }
+  if src.background.cellauto.init.is_some() {
+    dest.background.cellauto.init = src.background.cellauto.init;
+  }
+  if src.background.cellauto.color.is_some() {
+    dest.background.cellauto.color = src.background.cellauto.color;
   }
 
   // Outputs: a non-empty list from a higher-priority layer fully replaces

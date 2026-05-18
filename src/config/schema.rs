@@ -435,7 +435,7 @@ pub struct ThemeConfig {
 #[derive(Debug, Clone, Deserialize, Serialize, Default, PartialEq)]
 pub struct BackgroundConfig {
   /// Which animation to run. `None` or `"none"` disables animations.
-  /// Currently supported: `"doom"`, `"matrix"`.
+  /// Currently supported: `"doom"`, `"matrix"`, `"cellauto"`.
   #[serde(default)]
   pub kind: Option<String>,
 
@@ -450,7 +450,10 @@ pub struct BackgroundConfig {
 
   /// Parameters for the cmatrix-style digital rain effect.
   #[serde(default)]
-  pub matrix: MatrixConfig,
+  pub matrix:   MatrixConfig,
+  /// Parameters for the elementary cellular automaton effect.
+  #[serde(default)]
+  pub cellauto: CellautoConfig,
 }
 
 /// Parameters for the DOOM-style fire animation. Field names mirror Ly's
@@ -515,6 +518,25 @@ pub struct MatrixConfig {
   /// shimmer). `0.0` disables.
   #[serde(default)]
   pub mutate_chance: Option<f32>,
+}
+
+/// Parameters for the cellular automaton effect
+#[derive(Debug, Clone, Deserialize, Serialize, Default, PartialEq, Eq)]
+pub struct CellautoConfig {
+  /// Wolfram rule number (0..=255). Common choices: 30 (chaos), 90
+  /// (Sierpiński from a single seed), 110 (Turing-complete, dense).
+  #[serde(default)]
+  pub rule: Option<u8>,
+
+  /// Initial seed strategy. Accepted forms: `"single"` (default — one live
+  /// cell mid-row), `"random"` (50/50 noise), `"random:DENSITY"` (e.g.
+  /// `"random:0.3"`).
+  #[serde(default)]
+  pub init: Option<String>,
+
+  /// Foreground color for lit cells (`#RRGGBB`, `0xRRGGBB`, or named).
+  #[serde(default)]
+  pub color: Option<String>,
 }
 
 /// Greeting alignment options

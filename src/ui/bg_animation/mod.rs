@@ -1,6 +1,7 @@
 //! Background animations rendered behind the login UI.
 
 pub mod braille;
+pub mod cellauto;
 pub mod doom;
 pub mod matrix;
 
@@ -25,6 +26,7 @@ pub trait Animation: Send + Sync {
 pub enum Kind {
   Doom,
   Matrix,
+  Cellauto,
 }
 
 /// Catalog entry for a registered animation kind.
@@ -47,6 +49,11 @@ pub const KINDS: &[KindInfo] = &[
     name:  "matrix",
     label: "Matrix",
   },
+  KindInfo {
+    kind:  Kind::Cellauto,
+    name:  "cellauto",
+    label: "Cellular Automata",
+  },
 ];
 
 impl Kind {
@@ -55,6 +62,7 @@ impl Kind {
     match name.trim().to_ascii_lowercase().as_str() {
       "doom" | "fire" => Some(Self::Doom),
       "matrix" | "cmatrix" => Some(Self::Matrix),
+      "cellauto" | "ca" | "cellular" => Some(Self::Cellauto),
       _ => None,
     }
   }
@@ -65,6 +73,7 @@ impl Kind {
 pub enum AnimationSpec {
   Doom(doom::Options),
   Matrix(matrix::Options),
+  Cellauto(cellauto::Options),
 }
 
 /// Construct an animation matching `spec`'s variant.
@@ -72,6 +81,7 @@ pub fn build(spec: &AnimationSpec) -> Box<dyn Animation> {
   match spec {
     AnimationSpec::Doom(opts) => Box::new(doom::Doom::new(opts.clone())),
     AnimationSpec::Matrix(opts) => Box::new(matrix::Matrix::new(opts.clone())),
+    AnimationSpec::Cellauto(opts) => Box::new(cellauto::Cellauto::new(opts.clone())),
   }
 }
 
@@ -82,6 +92,7 @@ impl Kind {
     match self {
       Self::Doom => AnimationSpec::Doom(doom::Options::default()),
       Self::Matrix => AnimationSpec::Matrix(matrix::Options::default()),
+      Self::Cellauto => AnimationSpec::Cellauto(cellauto::Options::default()),
     }
   }
 }
@@ -137,6 +148,9 @@ mod tests {
     assert_eq!(Kind::from_name("doom"), Some(Kind::Doom));
     assert_eq!(Kind::from_name("DOOM"), Some(Kind::Doom));
     assert_eq!(Kind::from_name("fire"), Some(Kind::Doom));
+    assert_eq!(Kind::from_name("cellauto"), Some(Kind::Cellauto));
+    assert_eq!(Kind::from_name("ca"), Some(Kind::Cellauto));
+    assert_eq!(Kind::from_name("Cellular"), Some(Kind::Cellauto));
     assert_eq!(Kind::from_name("none"), None);
     assert_eq!(Kind::from_name(""), None);
     assert_eq!(Kind::from_name("matrix"), Some(Kind::Matrix));

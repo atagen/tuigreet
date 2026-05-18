@@ -1137,7 +1137,7 @@ impl Greeter {
     &mut self,
     cfg: &tuigreet::config::BackgroundConfig,
   ) {
-    use crate::ui::bg_animation::{Kind, doom, matrix};
+    use crate::ui::bg_animation::{Kind, cellauto, doom, matrix};
 
     let Some(kind) = cfg.kind.as_deref().and_then(Kind::from_name) else {
       if let Some(name) = cfg.kind.as_deref()
@@ -1183,6 +1183,18 @@ impl Greeter {
           min_speed:     cfg.matrix.min_speed.unwrap_or(d.min_speed),
           max_speed:     cfg.matrix.max_speed.unwrap_or(d.max_speed),
           mutate_chance: cfg.matrix.mutate_chance.unwrap_or(d.mutate_chance),
+      Kind::Cellauto => {
+        let d = cellauto::Options::default();
+        let init = cfg
+          .cellauto
+          .init
+          .as_deref()
+          .and_then(cellauto::Init::from_name)
+          .unwrap_or(d.init);
+        AnimationSpec::Cellauto(cellauto::Options {
+          rule: cfg.cellauto.rule.unwrap_or(d.rule),
+          init,
+          color: parse(&cfg.cellauto.color, d.color),
         })
       },
     };
