@@ -1,5 +1,6 @@
 //! Background animations rendered behind the login UI.
 
+pub mod braille;
 pub mod doom;
 pub mod matrix;
 
