@@ -793,19 +793,37 @@ async fn test_doom_animation_renders_and_form_stays_legible() {
     buffer = render_ui(greeter.clone(), 80, 24).await;
   }
 
-  // Some cell on the bottom row should be a fire glyph — the bottom is
-  // re-stamped to STEPS=12 every frame.
-  let bottom = 23u16;
+  // The fire animation should still be rendering — the row immediately
+  // above the status bar is part of the animation area.
   let fire_glyphs = ['░', '▒', '▓', '█'];
-  let bottom_has_fire = (0..80).any(|x| {
-    buffer[(x, bottom)]
+  let above_status_has_fire = (0..80).any(|x| {
+    buffer[(x, 22u16)]
       .symbol()
       .chars()
       .next()
       .map(|c| fire_glyphs.contains(&c))
       .unwrap_or(false)
   });
-  assert!(bottom_has_fire, "fire should render on the bottom row");
+  assert!(
+    above_status_has_fire,
+    "fire should render in the animation area above the status bar"
+  );
+
+  // The status bar occupies the very bottom row when window_padding is
+  // 0; it must be cleared before the help text renders so the fire
+  // doesn't bleed through behind the F-key labels.
+  let status_has_fire = (0..80).any(|x| {
+    buffer[(x, 23u16)]
+      .symbol()
+      .chars()
+      .next()
+      .map(|c| fire_glyphs.contains(&c))
+      .unwrap_or(false)
+  });
+  assert!(
+    !status_has_fire,
+    "fire must not bleed through the status bar row"
+  );
 
   // The login form sits in the middle of the screen; its inner cells must
   // not contain fire glyphs because Clear wipes them before the form draws.

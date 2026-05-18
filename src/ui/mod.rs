@@ -29,7 +29,7 @@ use tui::{
   layout::{Alignment, Constraint, Direction, Layout},
   style::Modifier,
   text::{Line, Span},
-  widgets::Paragraph,
+  widgets::{Clear, Paragraph},
 };
 use tuigreet::{Mode, config::WidgetPosition};
 use util::buttonize;
@@ -136,8 +136,18 @@ where
 
     let chunks = Layout::default().constraints(constraints).split(size);
 
+    // When an animation is running, the time and status rows would
+    // otherwise show whatever the animation painted in the cells around
+    // the spans of the Paragraphs below — `Clear` wipes the row so the
+    // help text stays legible (matches how the form widgets handle the
+    // same problem).
+    let animated = greeter.animation.is_some();
+
     // Render time widget if enabled and not hidden
     if let Some(slot) = time_slot {
+      if animated {
+        f.render_widget(Clear, chunks[slot]);
+      }
       let time_text = Span::from(get_time(&greeter));
       let time = Paragraph::new(time_text)
         .alignment(Alignment::Center)
@@ -148,6 +158,9 @@ where
 
     // Render status bar if not hidden
     if let Some(slot) = status_slot {
+      if animated {
+        f.render_widget(Clear, chunks[slot]);
+      }
       let status_block_size_right = 1
         + greeter.window_padding()
         + fl!("status_caps").chars().count() as u16;
